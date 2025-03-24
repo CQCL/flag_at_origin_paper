@@ -1,6 +1,6 @@
 LICENSE AGREEMENT - TERMS AND CONDITIONS FOR USE
 
-By using the software included in this repository (https://github.com/CQCL/CSS_flag_FT_stateprep) ("Software"), you hereby accept the terms and conditions of 
+By using the software included in this repository (https://github.com/CQCL/flag_at_origin_paper) ("Software"), you hereby accept the terms and conditions of 
 this Agreement.
 
 LICENSE GRANTS. Subject to the terms of this Agreement, Quantinuum grants to users a non-exclusive, non-sublicensable, revocable, 
