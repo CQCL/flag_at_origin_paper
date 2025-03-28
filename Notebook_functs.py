@@ -30,7 +30,8 @@ def generate_FT_plaq_notebook(distance, qubits):
     filename = f"{distance}_{qubits}_X_ft_plaquette.txt"
 
     # Read circuit from text file
-    with open(filename, "r") as file:
+    file_path = os.path.join(folder_path, "Notebook_2", filename)
+    with open(file_path, "r") as file:
         circuit_dict_str = file.read()
 
     # Convert string back to dictionary
@@ -162,7 +163,8 @@ def choose_code(user_key):
 
         # Open and load the circuit from the specified file (entire_circuit)
         circuit_filename = circuit_data["entire_circuit"]
-        with open(circuit_filename, 'r') as f:
+        json_path = os.path.join(folder_path, "Notebook_1", circuit_filename)
+        with open(json_path, 'r') as f:
             circuit_json = json.load(f)
 
         # Convert the loaded JSON into a pytket Circuit object
@@ -190,9 +192,9 @@ def evaluate_logical_error_rate(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "depolarizing": ["log_err.jpg", "acc_rat.jpg"],  # Two images
+        "depolarizing": ["Notebook_1/log_err.jpg", "Notebook_1/acc_rat.jpg"],  # Two images
        # "emulator": 'emulator.txt',  # Example string
-        "hardware": "hardware.txt"  # Example string
+        "hardware": "Notebook_1/hardware.txt"  # Example string
     }
 
     if media_key in media_dict:
@@ -210,16 +212,28 @@ def evaluate_logical_error_rate(media_key):
             
             # Loop through the images and plot each one
             for i, img_path in enumerate(media_value):
-                img = mpimg.imread(img_path)
+                # Debugging: Check if the file exists
+                print(f"Checking file path: {img_path}")
+                if not os.path.exists(img_path):
+                    print(f"ERROR: {img_path} not found!")
+                    return
+
+                img = mpimg.imread(img_path)  # This line now uses the full path
                 axes[i].imshow(img)
                 axes[i].axis('off')  # Turn off axis for better presentation
             
             plt.show()  # Show the images
+            
         # If it's a single image (not a list)
         elif media_value.endswith(".jpg"):
             # Plot the single image
             print(f"Displaying image: {media_value}")
-            img = mpimg.imread(media_value)
+            # Debugging: Check if the file exists
+            if not os.path.exists(media_value):
+                print(f"ERROR: {media_value} not found!")
+                return
+
+            img = mpimg.imread(media_value)  # This line now uses the full path
             plt.imshow(img)
             plt.axis('off')  # Turn off axis for better presentation
             plt.show()
@@ -236,7 +250,6 @@ def evaluate_logical_error_rate(media_key):
     else:
         print("Invalid media key! Please try again.")
 
-
     return
 
 
@@ -244,11 +257,11 @@ def show_hardware_shots(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "hardware_exp1": 'errors_vectors_CX.txt',  # Two images
-        "hardware_exp2": 'errors_vectors_CX_DD.txt',  # Example string
-        "hardware_exp3": 'errors_vectors_CZ.txt',  # Two images
-        "hardware_exp4": 'errors_vectors_CZ_DD.txt',  # Example string
-        "hardware_exp5": 'errors_vectors_CZ_customDD.txt',  # Two images
+        "hardware_exp1": 'Notebook_1/errors_vectors_CX.txt',  # Two images
+        "hardware_exp2": 'Notebook_1/errors_vectors_CX_DD.txt',  # Example string
+        "hardware_exp3": 'Notebook_1/errors_vectors_CZ.txt',  # Two images
+        "hardware_exp4": 'Notebook_1/errors_vectors_CZ_DD.txt',  # Example string
+        "hardware_exp5": 'Notebook_1/errors_vectors_CZ_customDD.txt',  # Two images
     }
 
     if media_key in media_dict:
@@ -357,7 +370,7 @@ def Steane_analysis(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "depolarizing": ["log_err2.jpg", "log_err3.jpg"],  # Two images
+        "depolarizing": ["Notebook_1/log_err2.jpg", "Notebook_1/log_err3.jpg"],  # Two images
     }
 
     if media_key in media_dict:
@@ -404,11 +417,11 @@ def Steane_analysis(media_key):
     return
 
 
-def Steane_analysis_onlyX():
+def Steane_analysis_onlyX(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "depolarizing": ["log_err2C.jpg"],  # Two images
+        "depolarizing": ["Notebook_1/log_err2C.jpg"],  # Two images
     }
 
     # Function to allow the user to input a key and display corresponding media
@@ -465,42 +478,42 @@ def evaluate_lUT(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "[[7,1,3]]_0.01": ['syndromes_S7_0.01F.txt', 'logical_operators_S7_0.01F.txt'],  
-        "[[7,1,3]]_0.005": ['syndromes_S7_0.005F.txt', 'logical_operators_S7_0.005F.txt'],
-        "[[7,1,3]]_0.0025": ['syndromes_S7_0.0025F.txt', 'logical_operators_S7_0.0025F.txt'],
-        "[[7,1,3]]_0.001": ['syndromes_S7_0.001F.txt', 'logical_operators_S7_0.001F.txt'],
-        "[[7,1,3]]_0.00075": ['syndromes_S7_0.00075F.txt', 'logical_operators_S7_0.00075F.txt'],
-        "[[7,1,3]]_0.0005": ['syndromes_S7_0.0005F.txt', 'logical_operators_S7_0.0005F.txt'],
-        "[[17,1,5]]_0.01": ['syndromes_S17_0.01F.txt', 'logical_operators_S17_0.01F.txt'],  
-        "[[17,1,5]]_0.005": ['syndromes_S17_0.005F.txt', 'logical_operators_S17_0.005F.txt'],
-        "[[17,1,5]]_0.0025": ['syndromes_S17_0.0025F.txt', 'logical_operators_S17_0.0025F.txt'],
-        "[[17,1,5]]_0.001": ['syndromes_S17_0.001F.txt', 'logical_operators_S17_0.001F.txt'],
-        "[[17,1,5]]_0.00075": ['syndromes_S17_0.00075F.txt', 'logical_operators_S17_0.00075F.txt'],
-        "[[17,1,5]]_0.0005": ['syndromes_S17_0.0005F.txt', 'logical_operators_S17_0.0005F.txt'],
-        "[[20,2,6]]_0.01": ['syndromes_D20_0.1_0.01F.txt', 'logical_operators_D20_0.1_0.01F.txt', 'logical_operators_D20_0.1_2_0.01F.txt'],  
-        "[[20,2,6]]_0.005": ['syndromes_D20_0.1_0.005F.txt', 'logical_operators_D20_0.1_0.005F.txt', 'logical_operators_D20_0.1_2_0.005F.txt'],
-        "[[20,2,6]]_0.0025": ['syndromes_D20_0.1_0.0025F.txt', 'logical_operators_D20_0.1_0.0025F.txt', 'logical_operators_D20_0.1_2_0.0025F.txt'],
-        "[[20,2,6]]_0.001": ['syndromes_D20_0.1_0.001F.txt', 'logical_operators_D20_0.1_0.001F.txt', 'logical_operators_D20_0.1_2_0.001F.txt'],
-        "[[20,2,6]]_0.00075": ['syndromes_D20_0.1_0.00075F.txt', 'logical_operators_D20_0.1_0.00075F.txt', 'logical_operators_D20_0.1_2_0.00075F.txt'],
-        "[[20,2,6]]_0.0005": ['syndromes_D20_0.1_0.0005F.txt', 'logical_operators_D20_0.1_0.0005F.txt', 'logical_operators_D20_0.1_2_0.0005F.txt'],
-        "[[23,1,7]]_0.01": ['syndromes_G23_0.01F.txt', 'logical_operators_G23_0.01F.txt'],  
-        "[[23,1,7]]_0.005": ['syndromes_G23_0.005F.txt', 'logical_operators_G23_0.005F.txt'],
-        "[[23,1,7]]_0.0025": ['syndromes_G23_0.0025F.txt', 'logical_operators_G23_0.0025F.txt'],
-        "[[23,1,7]]_0.001": ['syndromes_G23_0.001F.txt', 'logical_operators_G23_0.001F.txt'],
-        "[[23,1,7]]_0.00075": ['syndromes_G23_0.00075F.txt', 'logical_operators_G23_0.00075F.txt'],
-        "[[23,1,7]]_0.0005": ['syndromes_G23_0.0005F.txt', 'logical_operators_G23_0.0005F.txt'],
-        "[[49,1,5]]_0.01": ['syndromes_49+_0.01F.txt', 'logical_operators_49+_0.01F.txt'],  
-        "[[49,1,5]]_0.005": ['syndromes_49+_0.005F.txt', 'logical_operators_49+_0.005F.txt'],
-        "[[49,1,5]]_0.0025": ['syndromes_49+_0.0025F.txt', 'logical_operators_49+_0.0025F.txt'],
-        "[[49,1,5]]_0.001": ['syndromes_49+_0.001F.txt', 'logical_operators_49+_0.001F.txt'],
-        "[[49,1,5]]_0.00075": ['syndromes_49+_0.00075F.txt', 'logical_operators_49+_0.00075F.txt'],
-        "[[49,1,5]]_0.0005": ['syndromes_49+_0.0005F.txt', 'logical_operators_49+_0.0005F.txt'],
-        "[[49,1,9]]_0.01": ['syndromes_49_0.01F.txt', 'logical_operators_49_0.01F.txt'],  
-        "[[49,1,9]]_0.005": ['syndromes_49_0.005F.txt', 'logical_operators_49_0.005F.txt'],
-        "[[49,1,9]]_0.0025": ['syndromes_49_0.0025F.txt', 'logical_operators_49_0.0025F.txt'],
-        "[[49,1,9]]_0.001": ['syndromes_49_0.001F.txt', 'logical_operators_49_0.001F.txt'],
-        "[[49,1,9]]_0.00075": ['syndromes_49_0.00075F.txt', 'logical_operators_49_0.00075F.txt'],
-        "[[49,1,9]]_0.0005": ['syndromes_49_0.0005F.txt', 'logical_operators_49_0.0005F.txt'],
+        "[[7,1,3]]_0.01": ['Notebook_1/syndromes_S7_0.01F.txt', 'Notebook_1/logical_operators_S7_0.01F.txt'],  
+        "[[7,1,3]]_0.005": ['Notebook_1/syndromes_S7_0.005F.txt', 'Notebook_1/logical_operators_S7_0.005F.txt'],
+        "[[7,1,3]]_0.0025": ['Notebook_1/syndromes_S7_0.0025F.txt', 'Notebook_1/logical_operators_S7_0.0025F.txt'],
+        "[[7,1,3]]_0.001": ['Notebook_1/syndromes_S7_0.001F.txt', 'Notebook_1/logical_operators_S7_0.001F.txt'],
+        "[[7,1,3]]_0.00075": ['Notebook_1/syndromes_S7_0.00075F.txt', 'Notebook_1/logical_operators_S7_0.00075F.txt'],
+        "[[7,1,3]]_0.0005": ['Notebook_1/syndromes_S7_0.0005F.txt', 'Notebook_1/logical_operators_S7_0.0005F.txt'],
+        "[[17,1,5]]_0.01": ['Notebook_1/syndromes_S17_0.01F.txt', 'Notebook_1/logical_operators_S17_0.01F.txt'],  
+        "[[17,1,5]]_0.005": ['Notebook_1/syndromes_S17_0.005F.txt', 'Notebook_1/logical_operators_S17_0.005F.txt'],
+        "[[17,1,5]]_0.0025": ['Notebook_1/syndromes_S17_0.0025F.txt', 'Notebook_1/logical_operators_S17_0.0025F.txt'],
+        "[[17,1,5]]_0.001": ['Notebook_1/syndromes_S17_0.001F.txt', 'Notebook_1/logical_operators_S17_0.001F.txt'],
+        "[[17,1,5]]_0.00075": ['Notebook_1/syndromes_S17_0.00075F.txt', 'Notebook_1/logical_operators_S17_0.00075F.txt'],
+        "[[17,1,5]]_0.0005": ['Notebook_1/syndromes_S17_0.0005F.txt', 'Notebook_1/logical_operators_S17_0.0005F.txt'],
+        "[[20,2,6]]_0.01": ['Notebook_1/syndromes_D20_0.1_0.01F.txt', 'Notebook_1/logical_operators_D20_0.1_0.01F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.01F.txt'],  
+        "[[20,2,6]]_0.005": ['Notebook_1/syndromes_D20_0.1_0.005F.txt', 'Notebook_1/logical_operators_D20_0.1_0.005F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.005F.txt'],
+        "[[20,2,6]]_0.0025": ['Notebook_1/syndromes_D20_0.1_0.0025F.txt', 'Notebook_1/logical_operators_D20_0.1_0.0025F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.0025F.txt'],
+        "[[20,2,6]]_0.001": ['Notebook_1/syndromes_D20_0.1_0.001F.txt', 'Notebook_1/logical_operators_D20_0.1_0.001F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.001F.txt'],
+        "[[20,2,6]]_0.00075": ['Notebook_1/syndromes_D20_0.1_0.00075F.txt', 'Notebook_1/logical_operators_D20_0.1_0.00075F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.00075F.txt'],
+        "[[20,2,6]]_0.0005": ['Notebook_1/Notebook_1/syndromes_D20_0.1_0.0005F.txt', 'Notebook_1/logical_operators_D20_0.1_0.0005F.txt', 'Notebook_1/logical_operators_D20_0.1_2_0.0005F.txt'],
+        "[[23,1,7]]_0.01": ['Notebook_1/syndromes_G23_0.01F.txt', 'Notebook_1/logical_operators_G23_0.01F.txt'],  
+        "[[23,1,7]]_0.005": ['Notebook_1/syndromes_G23_0.005F.txt', 'Notebook_1/logical_operators_G23_0.005F.txt'],
+        "[[23,1,7]]_0.0025": ['Notebook_1/syndromes_G23_0.0025F.txt', 'Notebook_1/logical_operators_G23_0.0025F.txt'],
+        "[[23,1,7]]_0.001": ['Notebook_1/syndromes_G23_0.001F.txt', 'Notebook_1/logical_operators_G23_0.001F.txt'],
+        "[[23,1,7]]_0.00075": ['Notebook_1/syndromes_G23_0.00075F.txt', 'Notebook_1/logical_operators_G23_0.00075F.txt'],
+        "[[23,1,7]]_0.0005": ['Notebook_1/syndromes_G23_0.0005F.txt', 'Notebook_1/logical_operators_G23_0.0005F.txt'],
+        "[[49,1,5]]_0.01": ['Notebook_1/syndromes_49+_0.01F.txt', 'Notebook_1/logical_operators_49+_0.01F.txt'],  
+        "[[49,1,5]]_0.005": ['Notebook_1/syndromes_49+_0.005F.txt', 'Notebook_1/logical_operators_49+_0.005F.txt'],
+        "[[49,1,5]]_0.0025": ['Notebook_1/syndromes_49+_0.0025F.txt', 'lNotebook_1/ogical_operators_49+_0.0025F.txt'],
+        "[[49,1,5]]_0.001": ['Notebook_1/syndromes_49+_0.001F.txt', 'Notebook_1/logical_operators_49+_0.001F.txt'],
+        "[[49,1,5]]_0.00075": ['Notebook_1/syndromes_49+_0.00075F.txt', 'lNotebook_1/ogical_operators_49+_0.00075F.txt'],
+        "[[49,1,5]]_0.0005": ['Notebook_1/syndromes_49+_0.0005F.txt', 'Notebook_1/logical_operators_49+_0.0005F.txt'],
+        "[[49,1,9]]_0.01": ['Notebook_1/syndromes_49_0.01F.txt', 'lNotebook_1/ogical_operators_49_0.01F.txt'],  
+        "[[49,1,9]]_0.005": ['Notebook_1/syndromes_49_0.005F.txt', 'Notebook_1/logical_operators_49_0.005F.txt'],
+        "[[49,1,9]]_0.0025": ['Notebook_1/syndromes_49_0.0025F.txt', 'Notebook_1/logical_operators_49_0.0025F.txt'],
+        "[[49,1,9]]_0.001": ['Notebook_1/syndromes_49_0.001F.txt', 'Notebook_1/logical_operators_49_0.001F.txt'],
+        "[[49,1,9]]_0.00075": ['Notebook_1/syndromes_49_0.00075F.txt', 'Notebook_1/logical_operators_49_0.00075F.txt'],
+        "[[49,1,9]]_0.0005": ['Notebook_1/syndromes_49_0.0005F.txt', 'Notebook_1/logical_operators_49_0.0005F.txt'],
     }
 
     # Check if the key exists in the media dictionary
@@ -521,78 +534,80 @@ def evaluate_lUT(media_key):
     return
 
 
-def evaluate_lUTSteane():
+def evaluate_lUTSteane(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
-        "[[7,1,3]]_0.01": ['syndromes_STE2_S7_0.01F2.txt', 'logical_operators_STE2_S7_0.01F2.txt'],  
-        "[[7,1,3]]_0.005": ['syndromes_STE2_S7_0.005F2.txt', 'logical_operators_STE2_S7_0.005F2.txt'],
-        "[[7,1,3]]_0.0025": ['syndromes_STE2_S7_0.0025F2.txt', 'logical_operators_STE2_S7_0.0025F2.txt'],
-        "[[7,1,3]]_0.001": ['syndromes_STE2_S7_0.001F2.txt', 'logical_operators_STE2_S7_0.001F2.txt'],
-        "[[7,1,3]]_0.00075": ['syndromes_STE2_S7_0.00075F2.txt', 'logical_operators_STE2_S7_0.00075F2.txt'],
-        "[[7,1,3]]_0.0005": ['syndromes_STE2_S7_0.0005F2.txt', 'logical_operators_STE2_S7_0.0005F2.txt'],
-        "[[7,1,3]]_0.00025": ['syndromes_STE2_S7_0.00025F2.txt', 'logical_operators_STE2_S7_0.00025F2.txt'],
-        "[[7,1,3]]_0.0001": ['syndromes_STE2_S7_0.0001F2.txt', 'logical_operators_STE2_S7_0.0001F2.txt'],
+        "[[7,1,3]]_0.1": ['Notebook_1/syndromes_STE2_S7_0.01F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.01F2.txt'],  
+        "[[7,1,3]]_0.05": ['Notebook_1/syndromes_STE2_S7_0.005F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.005F2.txt'],
+        "[[7,1,3]]_0.025": ['Notebook_1/syndromes_STE2_S7_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.0025F2.txt'],
+        "[[7,1,3]]_0.01": ['Notebook_1/syndromes_STE2_S7_0.001F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.001F2.txt'],
+        "[[7,1,3]]_0.0075": ['Notebook_1/syndromes_STE2_S7_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.00075F2.txt'],
+        "[[7,1,3]]_0.005": ['Notebook_1/syndromes_STE2_S7_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.0005F2.txt'],
+        "[[7,1,3]]_0.0025": ['Notebook_1/syndromes_STE2_S7_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.00025F2.txt'],
+        "[[7,1,3]]_0.001": ['Notebook_1/syndromes_STE2_S7_0.0001F2.txt', 'Notebook_1/logical_operators_STE2_S7_0.0001F2.txt'],
 
-        "[[17,1,5]]_0.01": ['syndromes_STE2_S17_0.01F2.txt', 'logical_operators_STE2_S17_0.01F2.txt'],  
-        "[[17,1,5]]_0.005": ['syndromes_STE2_S17_0.005F2.txt', 'logical_operators_STE2_S17_0.005F2.txt'],
-        "[[17,1,5]]_0.0025": ['syndromes_STE2_S17_0.0025F2.txt', 'logical_operators_STE2_S17_0.0025F2.txt'],
-        "[[17,1,5]]_0.001": ['syndromes_STE2_S17_0.001F2.txt', 'logical_operators_STE2_S17_0.001F2.txt'],
-        "[[17,1,5]]_0.00075": ['syndromes_STE2_S17_0.00075F2.txt', 'logical_operators_STE2_S17_0.00075F2.txt'],
-        "[[17,1,5]]_0.0005": ['syndromes_STE2_S17_0.0005F2.txt', 'logical_operators_STE2_S17_0.0005F2.txt'],
-        "[[17,1,5]]_0.00025": ['syndromes_STE2_S17_0.00025F2.txt', 'logical_operators_STE2_S17_0.00025F2.txt'],
-        "[[17,1,5]]_0.0001": ['syndromes_STE2_S17_0.0001F2.txt', 'logical_operators_STE2_S17_0.0001F2.txt'],
+        "[[17,1,5]]_0.1": ['Notebook_1/syndromes_STE2_S17_0.01F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.01F2.txt'],  
+        "[[17,1,5]]_0.05": ['Notebook_1/syndromes_STE2_S17_0.005F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.005F2.txt'],
+        "[[17,1,5]]_0.025": ['Notebook_1/syndromes_STE2_S17_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.0025F2.txt'],
+        "[[17,1,5]]_0.01": ['Notebook_1/syndromes_STE2_S17_0.001F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.001F2.txt'],
+        "[[17,1,5]]_0.0075": ['Notebook_1/syndromes_STE2_S17_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.00075F2.txt'],
+        "[[17,1,5]]_0.005": ['Notebook_1/syndromes_STE2_S17_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.0005F2.txt'],
+        "[[17,1,5]]_0.0025": ['Notebook_1/syndromes_STE2_S17_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.00025F2.txt'],
+        "[[17,1,5]]_0.001": ['Notebook_1/syndromes_STE2_S17_0.0001F2.txt', 'Notebook_1/logical_operators_STE2_S17_0.0001F2.txt'],
 
-        "[[20,2,6]]_0.01": ['syndromes_STE2_D20_0.01F2.txt', 'logical_operators_STE2_D20_0.01F2.txt', 'logical_operators_STE2_D20_2_0.01F2.txt'],  
-        "[[20,2,6]]_0.005": ['syndromes_STE2_D20_0.005F2.txt', 'logical_operators_STE2_D20_0.005F2.txt', 'logical_operators_STE2_D20_2_0.005F2.txt'],
-        "[[20,2,6]]_0.0025": ['syndromes_STE2_D20_0.0025F2.txt', 'logical_operators_STE2_D20_0.0025F2.txt', 'logical_operators_STE2_D20_2_0.0025F2.txt'],
-        "[[20,2,6]]_0.001": ['syndromes_STE2_D20_0.001F2.txt', 'logical_operators_STE2_D20_0.001F2.txt', 'logical_operators_STE2_D20_2_0.001F2.txt'],
-        "[[20,2,6]]_0.00075": ['syndromes_STE2_D20_0.00075F2.txt', 'logical_operators_STE2_D20_0.00075F2.txt', 'logical_operators_STE2_D20_2_0.00075F2.txt'],
-        "[[20,2,6]]_0.0005": ['syndromes_STE2_D20_0.0005F2.txt', 'logical_operators_STE2_D20_0.0005F2.txt', 'logical_operators_STE2_D20_2_0.0005F2.txt'],
-        "[[20,2,6]]_0.00025": ['syndromes_STE2_D20_0.00025F2.txt', 'logical_operators_STE2_D20_0.00025F2.txt', 'logical_operators_STE2_D20_2_0.00025F2.txt'],
-        "[[20,2,6]]_0.0001": ['syndromes_STE2_D20_0.0001F2.txt', 'logical_operators_STE2_D20_0.0001F2.txt', 'logical_operators_STE2_D20_2_0.0001F2.txt'],
+        "[[20,2,6]]_0.1": ['Notebook_1/syndromes_STE2_D20_0.01F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.01F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.01F2.txt'],  
+        "[[20,2,6]]_0.05": ['Notebook_1/syndromes_STE2_D20_0.005F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.005F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.005F2.txt'],
+        "[[20,2,6]]_0.025": ['Notebook_1/syndromes_STE2_D20_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.0025F2.txt'],
+        "[[20,2,6]]_0.01": ['Notebook_1/syndromes_STE2_D20_0.001F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.001F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.001F2.txt'],
+        "[[20,2,6]]_0.0075": ['Notebook_1/syndromes_STE2_D20_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.00075F2.txt'],
+        "[[20,2,6]]_0.005": ['Notebook_1/syndromes_STE2_D20_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.0005F2.txt'],
+        "[[20,2,6]]_0.0025": ['Notebook_1/syndromes_STE2_D20_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.00025F2.txt'],
+        "[[20,2,6]]_0.001": ['Notebook_1/syndromes_STE2_D20_0.0001F2.txt', 'Notebook_1/logical_operators_STE2_D20_0.0001F2.txt', 'Notebook_1/logical_operators_STE2_D20_2_0.0001F2.txt'],
 
-        "[[23,1,7]]_0.01": ['syndromes_STE2_G23_0.01F2.txt', 'logical_operators_STE2_G23_0.01F2.txt'],  
-        "[[23,1,7]]_0.005": ['syndromes_STE2_G23_0.005F2.txt', 'logical_operators_STE2_G23_0.005F2.txt'],
-        "[[23,1,7]]_0.0025": ['syndromes_STE2_G23_0.0025F2.txt', 'logical_operators_STE2_G23_0.0025F2.txt'],
-        "[[23,1,7]]_0.001": ['syndromes_STE2_G23_0.001F2.txt', 'logical_operators_STE2_G23_0.001F2.txt'],
-        "[[23,1,7]]_0.00075": ['syndromes_STE2_G23_0.00075F2.txt', 'logical_operators_STE2_G23_0.00075F2.txt'],
-        "[[23,1,7]]_0.0005": ['syndromes_STE2_G23_0.0005F2.txt', 'logical_operators_STE2_G23_0.0005F2.txt'],
-        "[[23,1,7]]_0.00025": ['syndromes_STE2_G23_0.00025F2.txt', 'logical_operators_STE2_G23_0.00025F2.txt'],
-        "[[23,1,7]]_0.0001": ['syndromes_STE2_G23_0.0001F2.txt', 'logical_operators_STE2_G23_0.0001F2.txt'],
+        "[[23,1,7]]_0.1": ['Notebook_1/syndromes_STE2_G23_0.01F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.01F2.txt'],  
+        "[[23,1,7]]_0.05": ['Notebook_1/syndromes_STE2_G23_0.005F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.005F2.txt'],
+        "[[23,1,7]]_0.025": ['Notebook_1/syndromes_STE2_G23_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.0025F2.txt'],
+        "[[23,1,7]]_0.01": ['Notebook_1/syndromes_STE2_G23_0.001F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.001F2.txt'],
+        "[[23,1,7]]_0.0075": ['Notebook_1/syndromes_STE2_G23_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.00075F2.txt'],
+        "[[23,1,7]]_0.005": ['Notebook_1/syndromes_STE2_G23_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.0005F2.txt'],
+        "[[23,1,7]]_0.0025": ['Notebook_1/syndromes_STE2_G23_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.00025F2.txt'],
+        "[[23,1,7]]_0.001": ['Notebook_1/syndromes_STE2_G23_0.0001F2.txt', 'Notebook_1/logical_operators_STE2_G23_0.0001F2.txt'],
 
-        "[[49,1,9]]_0.01": ['syndromes_STE2_49_0.01F2.txt', 'logical_operators_STE2_49_0.01F2.txt'],  
-        "[[49,1,9]]_0.005": ['syndromes_STE2_49_0.005F2.txt', 'logical_operators_STE2_49_0.005F2.txt'],
-        "[[49,1,9]]_0.0025": ['syndromes_STE2_49_0.0025F2.txt', 'logical_operators_STE2_49_0.0025F2.txt'],
-        "[[49,1,9]]_0.001": ['syndromes_STE2_49_0.001F2.txt', 'logical_operators_STE2_49_0.001F2.txt'],
-        "[[49,1,9]]_0.00075": ['syndromes_STE2_49_0.00075F2.txt', 'logical_operators_STE2_49_0.00075F2.txt'],
-        "[[49,1,9]]_0.0005": ['syndromes_STE2_49_0.0005F2.txt', 'logical_operators_STE2_49_0.0005F2txt'],
-        "[[49,1,9]]_0.00025": ['syndromes_STE2_49_0.00025F2.txt', 'logical_operators_STE2_49_0.00025F2.txt'],
-        "[[49,1,9]]_0.0001": ['syndromes_STE2_49_0.0001F2.txt', 'logical_operators_STE2_49_0.0001F2.txt'],
+        "[[49,1,5]]_0.1": ['Notebook_1/syndromes_STE2_49+_0.01F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.01F2.txt'],  
+        "[[49,1,5]]_0.05": ['Notebook_1/syndromes_STE2_49+_0.005F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.005F2.txt'],
+        "[[49,1,5]]_0.025": ['Notebook_1/syndromes_STE2_49+_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.0025F2.txt'],
+        "[[49,1,5]]_0.01": ['Notebook_1/syndromes_STE2_49+_0.001F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.001F2.txt'],
+        "[[49,1,5]]_0.0075": ['Notebook_1/syndromes_STE2_49+_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.00075F2.txt'],
+        "[[49,1,5]]_0.005": ['Notebook_1/syndromes_STE2_49+_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.0005F2txt'],
+        "[[49,1,5]]_0.0025": ['Notebook_1/syndromes_STE2_49+_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_49+_0.00025F2.txt'],
+        "[[49,1,5]]_0.001": ['Notebook_1/syndromes_STE2_49+_0.0001F2.txt', 'logical_operators_STE2_49+_0.0001F2.txt'],
+
+        "[[49,1,9]]_0.1": ['Notebook_1/syndromes_STE2_49_0.01F2.txt', 'Notebook_1/logical_operators_STE2_49_0.01F2.txt'],  
+        "[[49,1,9]]_0.05": ['Notebook_1/syndromes_STE2_49_0.005F2.txt', 'Notebook_1/logical_operators_STE2_49_0.005F2.txt'],
+        "[[49,1,9]]_0.025": ['Notebook_1/syndromes_STE2_49_0.0025F2.txt', 'Notebook_1/logical_operators_STE2_49_0.0025F2.txt'],
+        "[[49,1,9]]_0.01": ['Notebook_1/syndromes_STE2_49_0.001F2.txt', 'Notebook_1/logical_operators_STE2_49_0.001F2.txt'],
+        "[[49,1,9]]_0.0075": ['Notebook_1/syndromes_STE2_49_0.00075F2.txt', 'Notebook_1/logical_operators_STE2_49_0.00075F2.txt'],
+        "[[49,1,9]]_0.005": ['Notebook_1/syndromes_STE2_49_0.0005F2.txt', 'Notebook_1/logical_operators_STE2_49_0.0005F2txt'],
+        "[[49,1,9]]_0.0025": ['Notebook_1/syndromes_STE2_49_0.00025F2.txt', 'Notebook_1/logical_operators_STE2_49_0.00025F2.txt'],
+        "[[49,1,9]]_0.001": ['Notebook_1/syndromes_STE2_49_0.0001F2.txt', 'logical_operators_STE2_49_0.0001F2.txt'],
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
 
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Displaying string from file: {media_value}")
-                # Read and display the string from the file
-                for file_path in media_value:
-                    try:
-                        with open(file_path, 'r') as f:
-                            print(f"Contents of {file_path}:\n{f.read()}\n")
-                    except Exception as e:
-                        print(f"Error reading file {file_path}: {e}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Displaying string from file: {media_value}")
+        # Read and display the string from the file
+        for file_path in media_value:
+            try:
+                with open(file_path, 'r') as f:
+                    print(f"Contents of {file_path}:\n{f.read()}\n")
+            except Exception as e:
+                print(f"Error reading file {file_path}: {e}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
