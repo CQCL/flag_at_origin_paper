@@ -121,7 +121,7 @@ def choose_code(user_key):
             "number_ANC": 85
         },
         "[[95,1,7]]": {
-            "entire_circuit": "Code_[[95,1,7]].json", 
+            "entire_circuit": "Code_[[95,1,7]]+.json", 
             "number_CNOTs": 1175, 
             "number_simQUBITS": 258, 
             "number_ANC": 380
