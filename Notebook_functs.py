@@ -5,6 +5,14 @@ from pytket.circuit import UnitID, OpType, Op
 from pytket._tket.circuit import Command
 from pytket.unit_id import QubitRegister, BitRegister
 from datetime import datetime
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from pytket import Circuit
+import webbrowser
+import os # for the folder path
+import json
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 
 def save_circuit(circ: Circuit, folder_path: str, filename=None) -> None:
@@ -14,15 +22,40 @@ def save_circuit(circ: Circuit, folder_path: str, filename=None) -> None:
     with open(folder_path + filename, 'w') as f:
         f.write(html)
 
-def choose_code():
+def generate_FT_plaq_notebook(distance, qubits):
 
-    from pytket import Circuit
-    import webbrowser
-    import os # for the folder path
-    import json
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-    folder_path = "/Users/diego.forlivesi/Desktop/code_pyt/" 
+    folder_path = os.path.dirname(os.path.abspath(__file__)) + '/' 
+
+    # Construct the filename using the provided values
+    filename = f"{distance}_{qubits}_X_ft_plaquette.txt"
+
+    # Read circuit from text file
+    with open(filename, "r") as file:
+        circuit_dict_str = file.read()
+
+    # Convert string back to dictionary
+    circuit_dict = eval(circuit_dict_str)
+
+    # Create a circuit object from the dictionary
+    loaded_circuit = Circuit.from_dict(circuit_dict)
+
+    # Test: Print the circuit to verify it's loaded correctly
+    print(loaded_circuit)
+
+    # Save the circuit to an HTML file
+    save_circuit(loaded_circuit, folder_path, filename=f'IMPORTED_circ_found.html')
+
+    # Open the HTML file in the default web browser
+    print("Opening file in browser...")
+    full_file_url = f'file://{os.path.abspath(os.path.join(folder_path, "IMPORTED_circ_found.html"))}'
+    webbrowser.open(full_file_url)
+
+    return
+
+
+def choose_code(user_key):
+
+    folder_path = os.path.dirname(os.path.abspath(__file__)) + '/'
 
     # Sample dictionary with pre-populated keys and values
     circuit_info_dict = {
@@ -119,125 +152,95 @@ def choose_code():
     }
 
     # Function to allow the user to input a key and print corresponding values
-    def get_circuit_info():
-        while True:
-            # Ask the user to input a key
-            user_key = input("Enter the circuit key (e.g. [[7,1,3]]): ").strip()
+   # """Retrieve and display circuit information based on the provided key."""
+    # Check if the key exists in the dictionary
+    if user_key in circuit_info_dict:
+        # Print the corresponding values
+        print("\nCircuit Information for key:", user_key)
+        circuit_data = circuit_info_dict[user_key]
+        print(circuit_data)
 
-            # Check if the key exists in the dictionary
-            if user_key in circuit_info_dict:
-                # Print the corresponding values
-                print("\nCircuit Information for key:", user_key)
-                circuit_data = circuit_info_dict[user_key]
-                print(circuit_data)
-                
-                # Open and load the circuit from the specified file (entire_circuit)
-                circuit_filename = circuit_data["entire_circuit"]
-                with open(circuit_filename, 'r') as f:
-                    circuit_json = json.load(f)
-                
-                # Convert the loaded JSON into a pytket Circuit object
-                entire_circuit = Circuit.from_dict(circuit_json)
-                print("Entire Circuit Data:")
-                
-                # Save the circuit to an HTML file
-                save_circuit(entire_circuit, folder_path, filename='ENTIRE_ft_circ_found.html')
-                
-                # Open the HTML file in the default web browser
-                print("Opening file in browser...")
-                full_file_url = f'file://{os.path.abspath(os.path.join(folder_path, "ENTIRE_ft_circ_found.html"))}'
-                webbrowser.open(full_file_url)
-                
-                # Print the circuit's additional information
-                print("Number of CNOTs:", circuit_data["number_CNOTs"])
-                print("Number of Sim Qubits:", circuit_data["number_simQUBITS"])
-                print("Number of Ancillas:", circuit_data["number_ANC"])
-            else:
-                print("Invalid key! Please try again.")
+        # Open and load the circuit from the specified file (entire_circuit)
+        circuit_filename = circuit_data["entire_circuit"]
+        with open(circuit_filename, 'r') as f:
+            circuit_json = json.load(f)
 
-            # Ask if they want to look up another key
-         #   another = input("\nDo you want to search for another circuit? (yes/no): ").strip().lower()
-         #   if another != "yes":
-            break
+        # Convert the loaded JSON into a pytket Circuit object
+        entire_circuit = Circuit.from_dict(circuit_json)
+        print("Entire Circuit Data:")
 
-    # Run the function to interact with the user
-    get_circuit_info()
+        # Save the circuit to an HTML file
+        save_circuit(entire_circuit, folder_path, filename='ENTIRE_ft_circ_found.html')
+
+        # Open the HTML file in the default web browser
+        print("Opening file in browser...")
+        full_file_url = f'file://{os.path.abspath(os.path.join(folder_path, "ENTIRE_ft_circ_found.html"))}'
+        webbrowser.open(full_file_url)
+
+        # Print the circuit's additional information
+        print("Number of CNOTs:", circuit_data["number_CNOTs"])
+        print("Number of Sim Qubits:", circuit_data["number_simQUBITS"])
+        print("Number of Ancillas:", circuit_data["number_ANC"])
+    else:
+        print("Invalid key! Please try again.")
 
     return
 
-def evaluate_logical_error_rate():
+def evaluate_logical_error_rate(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
         "depolarizing": ["log_err.jpg", "acc_rat.jpg"],  # Two images
-        "emulator": 'emulator.txt',  # Example string
+       # "emulator": 'emulator.txt',  # Example string
         "hardware": "hardware.txt"  # Example string
     }
 
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                # If the value is a list (multiple images)
-                if isinstance(media_value, list):
-                    # Plot the images side by side
-                    print(f"Displaying {len(media_value)} images.")
-                    fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
-                    
-                    # Ensure axes is a list even if there is only one image
-                    if len(media_value) == 1:
-                        axes = [axes]
-                    
-                    # Loop through the images and plot each one
-                    for i, img_path in enumerate(media_value):
-                        img = mpimg.imread(img_path)
-                        axes[i].imshow(img)
-                        axes[i].axis('off')  # Turn off axis for better presentation
-                    
-                    plt.show()  # Show the images
-                # If it's a single image (not a list)
-                elif media_value.endswith(".jpg"):
-                    # Plot the single image
-                    print(f"Displaying image: {media_value}")
-                    img = mpimg.imread(media_value)
-                    plt.imshow(img)
-                    plt.axis('off')  # Turn off axis for better presentation
-                    plt.show()
-                else:
-                    # If it's a text file and read the content
-                    if media_value.endswith(".txt"):
-                        print(f"Displaying string from file: {media_value}")
-                        # Read and display the string from the file
-                        with open(media_value, 'r') as f:
-                            print(f.read())
-                    else:
-                        # If it's just a plain string, display it
-                        print(f"Media Information: {media_value}")
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        # If the value is a list (multiple images)
+        if isinstance(media_value, list):
+            # Plot the images side by side
+            print(f"Displaying {len(media_value)} images.")
+            fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
+            
+            # Ensure axes is a list even if there is only one image
+            if len(media_value) == 1:
+                axes = [axes]
+            
+            # Loop through the images and plot each one
+            for i, img_path in enumerate(media_value):
+                img = mpimg.imread(img_path)
+                axes[i].imshow(img)
+                axes[i].axis('off')  # Turn off axis for better presentation
+            
+            plt.show()  # Show the images
+        # If it's a single image (not a list)
+        elif media_value.endswith(".jpg"):
+            # Plot the single image
+            print(f"Displaying image: {media_value}")
+            img = mpimg.imread(media_value)
+            plt.imshow(img)
+            plt.axis('off')  # Turn off axis for better presentation
+            plt.show()
+        else:
+            # If it's a text file, read the content
+            if media_value.endswith(".txt"):
+                print(f"Displaying string from file: {media_value}")
+                # Read and display the string from the file
+                with open(media_value, 'r') as f:
+                    print(f.read())
             else:
-                print("Invalid media key! Please try again.")
-
-            # Ask if they want to look up another media
-           # another = input("\nDo you want to search for another media? (yes/no): ").strip().lower()
-           # if another != "yes":
-            break
-
-    # Run the function to display media
-    display_media()
+                # If it's just a plain string, display it
+                print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
 
     return
 
 
-def show_hardware_shots():
+def show_hardware_shots(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -248,64 +251,46 @@ def show_hardware_shots():
         "hardware_exp5": 'errors_vectors_CZ_customDD.txt',  # Two images
     }
 
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                # If the value is a list (multiple images)
-                if isinstance(media_value, list):
-                    # Plot the images side by side
-                    print(f"Displaying {len(media_value)} images.")
-                    fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
-                    
-                    # Ensure axes is a list even if there is only one image
-                    if len(media_value) == 1:
-                        axes = [axes]
-                    
-                    # Loop through the images and plot each one
-                    for i, img_path in enumerate(media_value):
-                        img = mpimg.imread(img_path)
-                        axes[i].imshow(img)
-                        axes[i].axis('off')  # Turn off axis for better presentation
-                    
-                    plt.show()  # Show the images
-                # If it's a single image (not a list)
-                elif media_value.endswith(".jpg"):
-                    # Plot the single image
-                    print(f"Displaying image: {media_value}")
-                    img = mpimg.imread(media_value)
-                    plt.imshow(img)
-                    plt.axis('off')  # Turn off axis for better presentation
-                    plt.show()
-                else:
-                    # If it's a text file and read the content
-                    if media_value.endswith(".txt"):
-                        print(f"Displaying string from file: {media_value}")
-                        # Read and display the string from the file
-                        with open(media_value, 'r') as f:
-                            print(f.read())
-                    else:
-                        # If it's just a plain string, display it
-                        print(f"Media Information: {media_value}")
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        # If the value is a list (multiple images)
+        if isinstance(media_value, list):
+            # Plot the images side by side
+            print(f"Displaying {len(media_value)} images.")
+            fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
+            
+            # Ensure axes is a list even if there is only one image
+            if len(media_value) == 1:
+                axes = [axes]
+            
+            # Loop through the images and plot each one
+            for i, img_path in enumerate(media_value):
+                img = mpimg.imread(img_path)
+                axes[i].imshow(img)
+                axes[i].axis('off')  # Turn off axis for better presentation
+            
+            plt.show()  # Show the images
+        # If it's a single image (not a list)
+        elif media_value.endswith(".jpg"):
+            # Plot the single image
+            print(f"Displaying image: {media_value}")
+            img = mpimg.imread(media_value)
+            plt.imshow(img)
+            plt.axis('off')  # Turn off axis for better presentation
+            plt.show()
+        else:
+            # If it's a text file, read the content
+            if media_value.endswith(".txt"):
+                print(f"Displaying string from file: {media_value}")
+                # Read and display the string from the file
+                with open(media_value, 'r') as f:
+                    print(f.read())
             else:
-                print("Invalid media key! Please try again.")
-
-            # Ask if they want to look up another media
-           # another = input("\nDo you want to search for another media? (yes/no): ").strip().lower()
-           # if another != "yes":
-            break
-
-    # Run the function to display media
-    display_media()
+                # If it's just a plain string, display it
+                print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
 
     return
@@ -318,9 +303,6 @@ def param_analysis():
         "depolarizing": ["log_err2.jpg", "acc_rat2.jpg"],  # Two images
     }
 
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
     # Function to allow the user to input a key and display corresponding media
     def display_media():
         while True:
@@ -371,62 +353,53 @@ def param_analysis():
     return
 
 
-def Steane_analysis():
+def Steane_analysis(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
         "depolarizing": ["log_err2.jpg", "log_err3.jpg"],  # Two images
     }
 
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = "depolarizing"
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                # If the value is a list (multiple images)
-                if isinstance(media_value, list):
-                    # Plot the images side by side
-                    print(f"Displaying {len(media_value)} images.")
-                    fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
-                    
-                    # Ensure axes is a list even if there is only one image
-                    if len(media_value) == 1:
-                        axes = [axes]
-                    
-                    # Loop through the images and plot each one
-                    for i, img_path in enumerate(media_value):
-                        img = mpimg.imread(img_path)
-                        axes[i].imshow(img)
-                        axes[i].axis('off')  # Turn off axis for better presentation
-                    
-                    plt.show()  # Show the images
-                # If it's a single image (not a list)
-                elif media_value.endswith(".jpg"):
-                    # Plot the single image
-                    print(f"Displaying image: {media_value}")
-                    img = mpimg.imread(media_value)
-                    plt.imshow(img)
-                    plt.axis('off')  # Turn off axis for better presentation
-                    plt.show()
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        # If the value is a list (multiple images)
+        if isinstance(media_value, list):
+            # Plot the images side by side
+            print(f"Displaying {len(media_value)} images.")
+            fig, axes = plt.subplots(1, len(media_value), figsize=(10, 5))  # Create a subplot grid
+            
+            # Ensure axes is a list even if there is only one image
+            if len(media_value) == 1:
+                axes = [axes]
+            
+            # Loop through the images and plot each one
+            for i, img_path in enumerate(media_value):
+                img = mpimg.imread(img_path)
+                axes[i].imshow(img)
+                axes[i].axis('off')  # Turn off axis for better presentation
+            
+            plt.show()  # Show the images
+        # If it's a single image (not a list)
+        elif media_value.endswith(".jpg"):
+            # Plot the single image
+            print(f"Displaying image: {media_value}")
+            img = mpimg.imread(media_value)
+            plt.imshow(img)
+            plt.axis('off')  # Turn off axis for better presentation
+            plt.show()
+        else:
+            # If it's a text file, read the content
+            if media_value.endswith(".txt"):
+                print(f"Displaying string from file: {media_value}")
+                # Read and display the string from the file
+                with open(media_value, 'r') as f:
+                    print(f.read())
             else:
-                print("Invalid media key! Please try again.")
-
-            # Ask if they want to look up another media
-           # another = input("\nDo you want to search for another media? (yes/no): ").strip().lower()
-           # if another != "yes":
-            break
-
-    # Run the function to display media
-    display_media()
-
+                # If it's just a plain string, display it
+                print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
@@ -438,9 +411,6 @@ def Steane_analysis_onlyX():
         "depolarizing": ["log_err2C.jpg"],  # Two images
     }
 
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
     # Function to allow the user to input a key and display corresponding media
     def display_media():
         while True:
@@ -491,7 +461,7 @@ def Steane_analysis_onlyX():
     return
 
 
-def evaluate_lUT():
+def evaluate_lUT(media_key):
 
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -533,28 +503,20 @@ def evaluate_lUT():
         "[[49,1,9]]_0.0005": ['syndromes_49_0.0005F.txt', 'logical_operators_49_0.0005F.txt'],
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Displaying string from file: {media_value}")
-                # Read and display the string from the file
-                for file_path in media_value:
-                    try:
-                        with open(file_path, 'r') as f:
-                            print(f"Contents of {file_path}:\n{f.read()}\n")
-                    except Exception as e:
-                        print(f"Error reading file {file_path}: {e}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Displaying string from file: {media_value}")
+        # Read and display the string from the file
+        for file_path in media_value:
+            try:
+                with open(file_path, 'r') as f:
+                    print(f"Contents of {file_path}:\n{f.read()}\n")
+            except Exception as e:
+                print(f"Error reading file {file_path}: {e}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
@@ -635,7 +597,7 @@ def evaluate_lUTSteane():
     return
 
 
-def specific_error_rate():
+def specific_error_rate(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -677,26 +639,20 @@ def specific_error_rate():
         "[[49,1,9]]_0.0005": 1.4515e-08,
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
 
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
+
 
     return
 
 
-def specific_acceptance_rate():
+def specific_acceptance_rate(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -739,26 +695,18 @@ def specific_acceptance_rate():
         "[[49,1,9]]_0.0005": 1 - 0.729074,
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
 
-def specific_error_rateSteane():
+def specific_error_rateSteane(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -813,26 +761,19 @@ def specific_error_rateSteane():
 
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
                
-    # Run the function to display media
-    display_media()
 
     return
 
 
-def specific_error_rateSteane_onlyX():
+def specific_error_rateSteane_onlyX(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -847,25 +788,18 @@ def specific_error_rateSteane_onlyX():
 
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
 
     return
 
-def specific_error_rateNOSteane():
+def specific_error_rateNOSteane(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -920,25 +854,17 @@ def specific_error_rateNOSteane():
      #   "[[49,1,5]]_0.001": ,
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
-def specific_confidence():
+def specific_confidence(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -981,26 +907,20 @@ def specific_confidence():
         "[[49,1,9]]_0.0005": [1.9156632185133218e-09, 1.0998029586060115e-07], 
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
 
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
 
-def specific_acceptance_confidence():
+def specific_acceptance_confidence(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -1045,25 +965,17 @@ def specific_acceptance_confidence():
         "[[49,1,9]]_0.0005": [1 - 0.7450907104295721 , 1 - 0.7455711404087282],
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
-def specific_confidenceSteane():
+def specific_confidenceSteane(media_key):
     
     # Sample second dictionary with possible image or string values
 
@@ -1120,26 +1032,18 @@ def specific_confidenceSteane():
         
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
 
-def specific_confidenceSteane_onlyX():
+def specific_confidenceSteane_onlyX(media_key):
     
     # Sample second dictionary with possible image or string values
     media_dict = {
@@ -1154,26 +1058,18 @@ def specific_confidenceSteane_onlyX():
 
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
 
 
-def specific_confidenceNOSteane():
+def specific_confidenceNOSteane(media_key):
     
     # Sample second dictionary with possible image or string values
     
@@ -1229,58 +1125,12 @@ def specific_confidenceNOSteane():
         
     }
 
-    # Function to allow the user to input a key and display corresponding media
-    def display_media():
-        while True:
-            # Ask the user to input a key for media (depolarizing, emulator, simulator)
-            media_key = input("\nEnter a key for media (depolarizing/emulator/simulator): ").strip()
-
-            # Check if the key exists in the media dictionary
-            if media_key in media_dict:
-                media_value = media_dict[media_key]
-                
-                print(f"Media Information: {media_value}")
-            break
-               
-    # Run the function to display media
-    display_media()
-
-    return
-
-
-def generate_FT_plaq_notebook():
-
-    from pytket import Circuit
-    import webbrowser
-    import os # for the folder path
-    #folder_path = os.getcwd()
-    folder_path = "/Users/diego.forlivesi/Desktop/code_pyt/" 
-    __file__ = "/Users/diego.forlivesi/Desktop/code_pyt/'IMPORTED_circ_found.html'" 
-
-    # Ask the user for the distance and number of qubits
-    distance = input("Enter the distance (e.g., 7): ")
-    qubits = input("Enter the number of qubits (e.g., 9): ")
-
-    # Construct the filename using the user-provided values
-    filename = f"{distance}_{qubits}_X_ft_plaquette.txt"
-
-    # Read circuit from text file
-    with open(filename, "r") as file:
-        circuit_dict_str = file.read()
-
-    # Convert string back to dictionary
-    circuit_dict = eval(circuit_dict_str)
-
-    # Create a circuit object from the dictionary
-    loaded_circuit = Circuit.from_dict(circuit_dict)
-
-    # Test: Print the circuit to verify it's loaded correctly
-    print(loaded_circuit)
-
-    save_circuit(loaded_circuit, folder_path, filename=f'IMPORTED_circ_found.html')
-    #Open the HTML file in the default web browser
-    print("Opening file in browser...")
-    full_file_url = f'file://{os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), f'IMPORTED_circ_found.html'))}'
-    webbrowser.open(full_file_url)
+    # Check if the key exists in the media dictionary
+    if media_key in media_dict:
+        media_value = media_dict[media_key]
+        
+        print(f"Media Information: {media_value}")
+    else:
+        print("Invalid media key! Please try again.")
 
     return
